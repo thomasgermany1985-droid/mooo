@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>InvestorsMoo</title>
+<meta name="theme-color" content="#22b455">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2322b455'/%3E%3Cpath d='M8 22V10l8 8 8-8v12' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================== THEME TOKENS =========================== */
+:root{
+  --bg:#e9f0ee;--bg2:#dfe9e6;--card:#fff;--side:#fff;--text:#18272c;--muted:#7b8b88;--line:#e8eeec;
+  --brand:#22b455;--brand-d:#169a44;--brand-soft:#e5f7eb;--red:#e5484d;--red-soft:#fdeaea;--amber:#f5a524;--amber-soft:#fff3dc;
+  --blue:#2f7cf6;--blue-soft:#e6f0ff;--purple:#8b5cf6;--purple-soft:#f0eafe;--shadow:0 6px 24px rgba(30,60,50,.07);--inset:#f5f9f8;
+}
+[data-theme=dark]{
+  --bg:#0c1311;--bg2:#101a17;--card:#151f1c;--side:#131c19;--text:#e8f1ee;--muted:#86a09a;--line:#24312d;
+  --brand:#2fcf68;--brand-d:#22b455;--brand-soft:#16301f;--red-soft:#3a1c1e;--amber-soft:#3a2d12;--blue-soft:#14284a;--purple-soft:#2a1f4a;
+  --shadow:0 6px 24px rgba(0,0,0,.35);--inset:#1a2622;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Inter,"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background:linear-gradient(160deg,var(--bg),var(--bg2));color:var(--text);min-height:100vh;font-size:14px;line-height:1.45;transition:background .3s,color .3s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:var(--brand-d);text-decoration:none}
+[hidden]{display:none!important}
+.muted{color:var(--muted)}
+.up{color:var(--brand-d)}.down{color:var(--red)}
+svg{display:block}
+
+/* =========================== BASE COMPONENTS =========================== */
+.card{background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--line);transition:background .3s,border-color .3s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:12px;font-weight:600;transition:.18s;white-space:nowrap}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 6px 16px rgba(34,180,85,.28)}
+.btn-primary:hover{background:var(--brand-d);transform:translateY(-1px)}
+.btn-ghost{background:var(--inset);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--brand)}
+.btn-danger{background:var(--red-soft);color:var(--red)}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:9px}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn.block{width:100%}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field>label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.input,.select{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--inset);outline:none;transition:.15s}
+.input:focus,.select:focus{border-color:var(--brand);background:var(--card);box-shadow:0 0 0 4px rgba(34,180,85,.12)}
+.input[readonly]{opacity:.75;cursor:not-allowed}
+.field.err .input{border-color:var(--red)}
+.err-msg{color:var(--red);font-size:12px;min-height:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pwd{position:relative}.pwd .input{padding-right:46px}
+.pwd button{position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:6px;color:var(--muted);border-radius:8px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.s-success{background:var(--brand-soft);color:var(--brand-d)}
+.s-pending{background:var(--amber-soft);color:#c98300}
+.s-declined{background:var(--red-soft);color:var(--red)}
+.s-reversed{background:var(--purple-soft);color:var(--purple)}
+.s-hold{background:var(--blue-soft);color:var(--blue)}
+.s-cancelled{background:var(--inset);color:var(--muted);border:1px solid var(--line)}
+.chip{padding:7px 14px;border-radius:99px;background:var(--inset);border:1px solid var(--line);font-weight:600;font-size:12.5px;color:var(--muted);transition:.15s}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.spinner{width:18px;height:18px;border:2.5px solid rgba(128,128,128,.25);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page{animation:rise .35s ease}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty b{display:block;color:var(--text);margin-bottom:4px;font-size:15px}
+.notice{display:flex;gap:12px;padding:14px 16px;border-radius:14px;background:var(--amber-soft);color:var(--text);border:1px solid rgba(245,165,36,.4);margin-bottom:16px;align-items:flex-start}
+.notice.bad{background:var(--red-soft);border-color:rgba(229,72,77,.35)}
+.notice.good{background:var(--brand-soft);border-color:rgba(34,180,85,.35)}
+.notice .btn{margin-top:8px}
+
+/* toast + modal */
+#toasts{position:fixed;top:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px;max-width:calc(100vw - 32px)}
+.toast{background:var(--text);color:var(--card);padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:rise .25s;font-weight:500;max-width:380px}
+.toast.bad{background:var(--red);color:#fff}.toast.good{background:var(--brand-d);color:#fff}
+.overlay{position:fixed;inset:0;background:rgba(8,16,14,.55);backdrop-filter:blur(3px);z-index:150;display:flex;align-items:center;justify-content:center;padding:16px;animation:rise .2s}
+.modal{background:var(--card);border-radius:20px;padding:26px;width:100%;max-width:420px;box-shadow:0 30px 80px rgba(0,0,0,.35);border:1px solid var(--line);max-height:92vh;overflow:auto}
+.modal h3{font-size:19px;margin-bottom:6px}
+
+/* =========================== AUTH =========================== */
+#authView{min-height:100vh;display:grid;grid-template-columns:1.05fr 1fr}
+.auth-hero{background:linear-gradient(150deg,#0f7a3a,#22b455 55%,#7fe0a2);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.auth-hero::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;right:-180px;bottom:-200px;background:rgba(255,255,255,.1)}
+.auth-hero h1{font-size:38px;line-height:1.15;margin:20px 0 14px;letter-spacing:-.02em}
+.auth-hero p{opacity:.9;max-width:420px;font-size:15px}
+.auth-hero .pts{display:grid;gap:12px;margin-top:30px;position:relative;z-index:1}
+.auth-hero .pt{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.14);padding:12px 16px;border-radius:14px;backdrop-filter:blur(4px);width:max-content;max-width:100%}
+.auth-side{display:flex;align-items:center;justify-content:center;padding:28px 20px}
+.auth-box{width:100%;max-width:460px}
+.auth-box h2{font-size:26px;letter-spacing:-.01em}
+.auth-box .sub{color:var(--muted);margin:4px 0 22px}
+.auth-pane{animation:rise .35s}
+.switch{text-align:center;margin-top:18px;color:var(--muted)}
+.switch button{color:var(--brand-d);font-weight:700}
+.logo{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:700;letter-spacing:-.02em}
+.logo svg{width:34px;height:34px}
+.strength{height:5px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:6px}
+.strength i{display:block;height:100%;width:0;transition:.25s;background:var(--red)}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer}
+.check input{accent-color:var(--brand);width:16px;height:16px}
+.cdrop{position:relative}
+.cbtn{width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--inset)}
+.cbtn img,.copt img{width:22px;height:16px;object-fit:cover;border-radius:3px;box-shadow:0 0 0 1px var(--line)}
+.cpanel{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.2);padding:8px}
+.cpanel .input{padding:9px 12px;margin-bottom:6px}
+.clist{max-height:230px;overflow:auto}
+.copt{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:9px;cursor:pointer;width:100%;text-align:left}
+.copt:hover,.copt.sel{background:var(--brand-soft)}
+.cfg{background:var(--amber-soft);border:1px solid var(--amber);padding:12px 14px;border-radius:12px;margin-bottom:16px;font-size:13px}
+
+/* =========================== APP SHELL =========================== */
+#appView{padding:22px}
+.shell{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:238px 1fr;background:var(--side);border-radius:26px;box-shadow:0 20px 60px rgba(20,60,45,.12);border:1px solid var(--line);min-height:calc(100vh - 44px);overflow:hidden}
+.sidebar{padding:26px 18px;display:flex;flex-direction:column;border-right:1px solid var(--line);position:sticky;top:0;height:calc(100vh - 44px);align-self:start}
+.nav{display:flex;flex-direction:column;gap:4px;margin-top:34px}
+.nav a{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;color:var(--muted);font-weight:500;transition:.15s;position:relative}
+.nav a svg{width:19px;height:19px;flex:none}
+.nav a:hover{background:var(--inset);color:var(--text)}
+.nav a.on{background:var(--brand-soft);color:var(--brand-d);font-weight:700}
+.nav a.on::before{content:"";position:absolute;left:-18px;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--brand)}
+.dot-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:11px;font-weight:700;min-width:19px;height:19px;border-radius:99px;display:grid;place-items:center;padding:0 5px}
+.advisor{margin-top:auto;text-align:center;background:var(--inset);border-radius:18px;padding:16px 14px}
+.advisor p{font-size:12px;color:var(--muted);margin:8px 0 12px}
+.main{padding:26px 30px 34px;min-width:0;background:var(--card);transition:background .3s}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:12px}
+.topbar h1{font-size:26px;letter-spacing:-.02em}
+.tb-right{display:flex;align-items:center;gap:12px}
+.iconbtn{position:relative;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;background:var(--card)}
+.iconbtn:hover{border-color:var(--brand)}
+.iconbtn .dot-badge{position:absolute;top:-5px;right:-4px;margin:0;border:2px solid var(--card)}
+.user-chip{display:flex;align-items:center;gap:10px;padding:4px 12px 4px 4px;border-radius:99px;border:1px solid var(--line);font-weight:600}
+.av{width:34px;height:34px;border-radius:50%;object-fit:cover;background:var(--brand-soft);display:block}
+.av.lg{width:96px;height:96px}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g-bottom{grid-template-columns:1.25fr 1fr}
+.stat{display:flex;flex-direction:column;gap:6px}
+.stat .lbl{color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.stat .val{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.stat .ico{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.stat .ico svg{width:19px;height:19px}
+.big{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600}
+.chart-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.ranges{display:flex;gap:2px;background:var(--inset);padding:4px;border-radius:12px;border:1px solid var(--line)}
+.ranges button{padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.ranges button.on{background:var(--card);color:var(--text);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+#chart{position:relative;height:250px;margin-top:10px;touch-action:pan-y}
+#chart svg{width:100%;height:100%}
+.tip{position:absolute;pointer-events:none;background:#4a5a56;color:#fff;font-size:11.5px;padding:6px 9px;border-radius:7px;transform:translate(-50%,-120%);white-space:nowrap;z-index:3}
+.gainer{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.gainer:last-child{border:0}
+.glogo{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+.gainer .nm{flex:1;min-width:0}.gainer .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gainer .pr{text-align:right}
+.adv-mobile{display:none}
+
+/* history */
+.tx{display:grid;grid-template-columns:150px 1.7fr 150px 130px 130px 90px;gap:12px;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line)}
+.tx.hd{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding-top:4px}
+.tx .id{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.tx .amt{font-weight:700;text-align:right}
+.tx .act{text-align:right}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+/* crypto */
+.ct{display:grid;grid-template-columns:34px 2fr 1.2fr 1fr 1.3fr 1.3fr;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line)}
+.ct.hd{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.ct img{width:30px;height:30px;border-radius:50%}
+.ct .r{text-align:right}
+.coin b{display:block}
+/* notifications */
+.nt{display:flex;gap:14px;padding:16px;border-radius:14px;border:1px solid var(--line);margin-bottom:10px;cursor:pointer;transition:.15s;background:var(--card)}
+.nt:hover{border-color:var(--brand)}
+.nt.unread{background:var(--brand-soft)}
+.nt .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--inset)}
+.nt .ttl{font-weight:700;display:flex;gap:8px;align-items:center}
+.nt .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.nt .tm{color:var(--muted);font-size:12px;margin-top:4px}
+/* profile */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.pgrid h3,.card h3{font-size:16px;margin-bottom:14px}
+.ava-row{display:flex;gap:18px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.locked{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:inline-flex;background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{padding:8px 16px;border-radius:9px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--brand);color:#fff}
+/* withdraw */
+.steps{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:600}
+.step i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--inset);border:1px solid var(--line);font-style:normal;font-size:12px}
+.step.on{color:var(--text)}.step.on i{background:var(--brand);border-color:var(--brand);color:#fff}
+.bank{display:flex;gap:14px;align-items:center;padding:14px;border-radius:14px;border:1.5px solid var(--line);margin-bottom:10px;cursor:pointer;width:100%;text-align:left;background:var(--card);transition:.15s}
+.bank:hover{border-color:var(--brand)}
+.bank.sel{border-color:var(--brand);background:var(--brand-soft)}
+.bank .bi{width:42px;height:42px;border-radius:12px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;flex:none}
+.bank .rm{margin-left:auto;color:var(--muted);padding:6px;border-radius:8px}
+.bank .rm:hover{color:var(--red)}
+.sumbox{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.sumbox div{background:var(--inset);border-radius:12px;padding:12px}
+.sumbox small{color:var(--muted);display:block;font-size:12px}
+.sumbox b{font-size:16px}
+.pinrow{display:flex;gap:10px;justify-content:center;margin:18px 0 8px}
+.pinrow input{width:54px;height:60px;text-align:center;font-size:24px;border-radius:14px;border:1.5px solid var(--line);background:var(--inset);outline:none}
+.pinrow input:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(34,180,85,.14)}
+.pinrow.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.okmark{width:70px;height:70px;border-radius:50%;background:var(--brand-soft);color:var(--brand-d);display:grid;place-items:center;margin:0 auto 14px}
+
+.bottombar{display:none}
+@media (max-width:1100px){.g3{grid-template-columns:1fr 1fr 1fr}.g-bottom{grid-template-columns:1fr}.tx{grid-template-columns:130px 1.4fr 130px 110px 120px 80px}}
+@media (max-width:900px){
+  #authView{grid-template-columns:1fr}.auth-hero{display:none}
+  #appView{padding:0}
+  .shell{grid-template-columns:1fr;border-radius:0;border:0;min-height:100vh}
+  .sidebar{display:none}
+  .main{padding:18px 16px 100px}
+  .adv-mobile{display:block;margin-top:16px}
+  .bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--card);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));justify-content:space-around}
+  .bottombar a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--muted);font-weight:600;padding:6px 10px;border-radius:12px;position:relative;min-width:58px}
+  .bottombar a svg{width:22px;height:22px}
+  .bottombar a.on{color:var(--brand-d)}
+  .bottombar .dot-badge{position:absolute;top:0;right:8px;margin:0}
+  .user-chip span{display:none}.user-chip{padding:3px}
+  .pgrid{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .g3{grid-template-columns:1fr}
+  .row,.locked{grid-template-columns:1fr}
+  .tx.hd,.ct.hd{display:none}
+  .tx{grid-template-columns:1fr auto;grid-template-areas:"type amt" "desc desc" "date st" "id act";gap:6px 10px;padding:14px 2px}
+  .tx>:nth-child(1){grid-area:id;color:var(--muted)}.tx>:nth-child(2){grid-area:desc}.tx>:nth-child(3){grid-area:date;color:var(--muted);font-size:12px}
+  .tx>:nth-child(4){grid-area:amt}.tx>:nth-child(5){grid-area:st;text-align:right}.tx>:nth-child(6){grid-area:act}
+  .tx .ty{grid-area:type;font-weight:700}
+  .tx{grid-template-areas:"ty amt" "desc desc" "date st" "id act"}
+  .tx>.ty{grid-area:ty}
+  .ct{grid-template-columns:34px 1fr auto;grid-template-areas:"lg nm pr" "lg ch pr"}
+  .ct>:nth-child(1){grid-area:lg}.ct>:nth-child(2){grid-area:nm}.ct>:nth-child(3){grid-area:pr}.ct>:nth-child(4){grid-area:ch}
+  .ct>:nth-child(5),.ct>:nth-child(6){display:none}
+  .topbar h1{font-size:22px}
+  .sumbox{grid-template-columns:1fr}
+  .auth-side{align-items:flex-start;padding-top:36px}
+  .ranges button{padding:6px 8px}
+}
+</style>
+</head>
+<body>
+<script>
+/* Startup watchdog: turns a silent white page into a readable message. */
+(function () {
+  function show(msg) {
+    var d = document.getElementById("bootErr");
+    if (!d) { d = document.createElement("div"); d.id = "bootErr"; d.style.cssText = "position:fixed;left:12px;right:12px;top:12px;z-index:9999;background:#fdeaea;color:#8a1c1f;border:1px solid #e5484d;border-radius:12px;padding:14px;font:14px/1.5 system-ui,sans-serif;white-space:pre-wrap;box-shadow:0 10px 30px rgba(0,0,0,.2)"; document.body.appendChild(d); }
+    d.textContent = msg;
+  }
+  var HELP = "\n\nCommon causes:\n• Opened as a file (file://) or plain http:// – use https:// or http://localhost\n• An ad-blocker / network / host is blocking scripts from www.gstatic.com\n• firebaseConfig was pasted incorrectly (check every value)\n• This domain is missing in Firebase → Authentication → Settings → Authorized domains\n\nPress F12 → Console for the exact error.";
+  addEventListener("error", function (e) { show("Startup error: " + (e.message || "a script failed to load") + HELP); }, true);
+  addEventListener("unhandledrejection", function (e) { show("Startup error: " + ((e.reason && e.reason.message) || e.reason) + HELP); });
+  if (location.protocol === "file:") show("This page was opened from a file (file://). Firebase sign-in does not work that way." + HELP);
+  setTimeout(function () {
+    var v = document.getElementById("authView") || document.getElementById("loginView"), a = document.getElementById("appView") || document.getElementById("app");
+    if (v && a && v.hidden && a.hidden && !document.getElementById("bootErr")) show("The page did not start within 8 seconds." + HELP);
+  }, 8000);
+})();
+</script>
+<div id="toasts"></div>
+
+<!-- ============================ AUTH ============================ -->
+<div id="authView" hidden>
+  <section class="auth-hero">
+    <div style="position:relative;z-index:1">
+      <div class="logo" style="color:#fff"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#fff" fill-opacity=".22"/><path d="M8 22V10l8 8 8-8v12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>InvestorsMoo</div>
+      <h1>Your portfolio,<br>beautifully clear.</h1>
+      <p>Track your investments, follow the crypto market and manage withdrawals with an advisor by your side.</p>
+    </div>
+    <div class="pts">
+      <div class="pt"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Live portfolio dashboard</div>
+      <div class="pt"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>PIN-protected withdrawals</div>
+      <div class="pt"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Real-time updates</div>
+    </div>
+  </section>
+  <section class="auth-side">
+    <div class="auth-box">
+      <div id="cfgWarn" class="cfg" hidden><b>Firebase is not configured yet.</b> Open <code>index.html</code> and paste your Firebase web config into <code>firebaseConfig</code> (see README).</div>
+
+      <div id="paneLogin" class="auth-pane">
+        <h2>Welcome back</h2><p class="sub">Sign in to your InvestorsMoo account.</p>
+        <form id="loginForm" novalidate>
+          <div class="field" id="f-lemail"><label for="lemail">Email address</label><input class="input" id="lemail" type="email" autocomplete="email" placeholder="you@example.com"><div class="err-msg"></div></div>
+          <div class="field" id="f-lpass"><label for="lpass">Password</label><div class="pwd"><input class="input" id="lpass" type="password" autocomplete="current-password" placeholder="Your password"><button type="button" class="eye" aria-label="Show password"></button></div><div class="err-msg"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px;align-items:center">
+            <label class="check"><input type="checkbox" id="remember" checked> Remember me</label>
+            <button type="button" id="toForgot" style="color:var(--brand-d);font-weight:600">Forgot password?</button>
+          </div>
+          <div class="err-msg" id="loginErr" style="margin-bottom:10px"></div>
+          <button class="btn btn-primary block" id="loginBtn" type="submit">Sign in</button>
+        </form>
+        <p class="switch">New here? <button id="toReg">Create an account</button></p>
+      </div>
+
+      <div id="paneForgot" class="auth-pane" hidden>
+        <h2>Reset password</h2><p class="sub">Enter your email and we'll send a secure reset link.</p>
+        <form id="forgotForm" novalidate>
+          <div class="field" id="f-femail"><label for="femail">Email address</label><input class="input" id="femail" type="email" placeholder="you@example.com"><div class="err-msg"></div></div>
+          <div id="forgotMsg" class="notice good" hidden></div>
+          <button class="btn btn-primary block" id="forgotBtn" type="submit">Send reset link</button>
+        </form>
+        <p class="switch muted" style="font-size:13px">Can't receive the email? Your <a data-advisor target="_blank" rel="noopener">advisor</a> can issue a one-time reset link for you.</p>
+        <p class="switch"><button class="toLogin">← Back to sign in</button></p>
+      </div>
+
+      <div id="paneReg" class="auth-pane" hidden>
+        <h2>Create your account</h2><p class="sub">It takes less than a minute.</p>
+        <form id="regForm" novalidate>
+          <div class="row">
+            <div class="field" id="f-rfn"><label for="rfn">First name</label><input class="input" id="rfn" autocomplete="given-name" placeholder="Jane"><div class="err-msg"></div></div>
+            <div class="field" id="f-rln"><label for="rln">Second name</label><input class="input" id="rln" autocomplete="family-name" placeholder="Doe"><div class="err-msg"></div></div>
+          </div>
+          <div class="field" id="f-remail"><label for="remail">Email address</label><input class="input" id="remail" type="email" autocomplete="email" placeholder="you@example.com"><div class="err-msg"></div></div>
+          <div class="field" id="f-rpass"><label for="rpass">Password</label><div class="pwd"><input class="input" id="rpass" type="password" autocomplete="new-password" placeholder="At least 8 characters"><button type="button" class="eye" aria-label="Show password"></button></div><div class="strength"><i id="strBar"></i></div><div class="err-msg"></div></div>
+          <div class="row">
+            <div class="field" id="f-rage"><label for="rage">Age</label><input class="input" id="rage" type="number" min="18" max="99" inputmode="numeric" placeholder="18 – 99"><div class="err-msg"></div></div>
+            <div class="field" id="f-rphone"><label for="rphone">Phone number</label><input class="input" id="rphone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567"><div class="err-msg"></div></div>
+          </div>
+          <div class="field" id="f-rnat"><label>Nationality</label><div class="cdrop" id="cdrop"></div><div class="err-msg"></div></div>
+          <div class="err-msg" id="regErr" style="margin-bottom:10px"></div>
+          <button class="btn btn-primary block" id="regBtn" type="submit">Create account</button>
+        </form>
+        <p class="switch">Already registered? <button class="toLogin">Sign in</button></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============================ APP ============================ -->
+<div id="appView" hidden>
+ <div class="shell">
+  <aside class="sidebar">
+    <div class="logo"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="9" fill="#22b455"/><path d="M8 22V10l8 8 8-8v12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>InvestorsMoo</div>
+    <nav class="nav" id="sideNav"></nav>
+    <div class="advisor">
+      <svg width="86" height="70" viewBox="0 0 86 70" style="margin:0 auto" aria-hidden="true"><circle cx="43" cy="35" r="31" fill="var(--brand-soft)"/><circle cx="43" cy="26" r="9" fill="#f2b48c"/><path d="M33 24c0-8 6-12 11-12s10 4 10 11c-3-3-9-4-13-3-3 0-6 2-8 4z" fill="#3a2a22"/><path d="M26 58c1-12 7-19 17-19s16 7 17 19z" fill="var(--brand)"/><circle cx="62" cy="48" r="7" fill="#f5c542"/><text x="62" y="52" font-size="9" font-weight="700" text-anchor="middle" fill="#8a5d00">$</text></svg>
+      <p>Get in contact with a professional financial advisor to multiply your investments profit!</p>
+      <a class="btn btn-ghost block" data-advisor target="_blank" rel="noopener">Contact advisor</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="tb-right">
+        <button class="iconbtn" id="bellBtn" aria-label="Notifications"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg><span class="dot-badge" id="bellBadge" hidden>0</span></button>
+        <a class="user-chip" href="#/profile"><img class="av" id="topAv" alt=""><span id="topName"></span></a>
+      </div>
+    </header>
+
+    <!-- HOME -->
+    <section id="page-home" class="page" hidden>
+      <div class="card">
+        <div class="chart-head">
+          <div>
+            <div class="muted">Total Invested Value</div>
+            <div><span class="big" id="hTotal">$0.00</span> <span class="pill" id="hPct"></span></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <a class="btn btn-primary btn-sm" href="#/withdraw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 17L17 7M8 7h9v9"/></svg>Withdraw</a>
+            <div class="ranges" id="ranges"><button data-r="1d">1d</button><button data-r="1w">1w</button><button data-r="1m" class="on">1m</button><button data-r="6m">6m</button><button data-r="1y">1y</button><button data-r="all">All</button></div>
+          </div>
+        </div>
+        <div id="chart"></div>
+      </div>
+      <div class="grid g3" style="margin-top:16px" id="statCards"></div>
+      <div class="grid g-bottom" style="margin-top:16px">
+        <div class="card"><h3>Top gainers</h3><div id="gainers"></div></div>
+        <div class="card">
+          <h3>Withdrawal balance</h3>
+          <div class="sumbox" style="grid-template-columns:1fr">
+            <div><small>Available to withdraw</small><b id="bAvail" class="up" style="font-size:22px">$0.00</b></div>
+            <div><small>Reserved (pending withdrawals)</small><b id="bRes">$0.00</b></div>
+          </div>
+          <a class="btn btn-primary block" href="#/withdraw">Transfer / Withdraw to bank</a>
+        </div>
+      </div>
+      <div class="card adv-mobile" style="text-align:center">
+        <b>Need guidance?</b><p class="muted" style="margin:4px 0 12px">Speak with a professional financial advisor.</p>
+        <a class="btn btn-ghost block" data-advisor target="_blank" rel="noopener">Contact advisor</a>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="page-history" class="page" hidden>
+      <div class="card">
+        <div class="toolbar" id="txFilters"></div>
+        <div class="tx hd"><div>Transaction ID</div><div>Description</div><div>Date &amp; time</div><div style="text-align:right">Amount</div><div>Status</div><div></div></div>
+        <div id="txList"></div>
+      </div>
+    </section>
+
+    <!-- CRYPTO -->
+    <section id="page-crypto" class="page" hidden>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap">
+          <div><h3 style="margin:0">Top 20 cryptocurrencies</h3><div class="muted" id="cryptoMeta" style="font-size:12.5px"></div></div>
+          <button class="btn btn-ghost btn-sm" id="cryptoRefresh">Refresh</button>
+        </div>
+        <div id="cryptoNotice"></div>
+        <div class="ct hd"><div></div><div>Coin</div><div class="r">Price</div><div class="r">24h</div><div class="r">Market cap</div><div class="r">Volume (24h)</div></div>
+        <div id="cryptoList"><div class="empty"><span class="spinner"></span></div></div>
+      </div>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section id="page-notifications" class="page" hidden>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h3 style="margin:0">Notifications</h3><button class="btn btn-ghost btn-sm" id="markAll">Mark all as read</button>
+        </div>
+        <div id="ntList"></div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="page-profile" class="page" hidden>
+      <div class="pgrid">
+        <div class="card">
+          <h3>Profile</h3>
+          <div class="ava-row">
+            <img class="av lg" id="pAv" alt="">
+            <div><button class="btn btn-ghost btn-sm" id="avBtn">Change photo</button><input type="file" id="avFile" accept="image/png,image/jpeg,image/webp" hidden><div class="muted" style="font-size:12px;margin-top:6px">JPG, PNG or WebP · max 5 MB</div></div>
+          </div>
+          <form id="nameForm" novalidate>
+            <div class="row">
+              <div class="field" id="f-pfn"><label for="pfn">First name</label><input class="input" id="pfn"><div class="err-msg"></div></div>
+              <div class="field" id="f-pln"><label for="pln">Second name</label><input class="input" id="pln"><div class="err-msg"></div></div>
+            </div>
+            <button class="btn btn-primary btn-sm" type="submit">Save name</button>
+          </form>
+          <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+          <div class="locked">
+            <div class="field"><label>Email</label><input class="input" id="pEmail" readonly></div>
+            <div class="field"><label>Phone</label><input class="input" id="pPhone" readonly></div>
+            <div class="field"><label>Age</label><input class="input" id="pAge" readonly></div>
+            <div class="field"><label>Nationality</label><input class="input" id="pNat" readonly></div>
+          </div>
+          <p class="muted" style="font-size:12.5px">To change these details, please <a data-advisor target="_blank" rel="noopener">contact your advisor</a>.</p>
+        </div>
+
+        <div style="display:grid;gap:16px">
+          <div class="card">
+            <h3>Appearance</h3>
+            <div class="seg" id="themeSeg"><button data-t="light">☀ Light</button><button data-t="dark">🌙 Dark</button></div>
+          </div>
+          <div class="card">
+            <h3>Transaction PIN</h3>
+            <p class="muted" id="pinState" style="margin-bottom:12px"></p>
+            <form id="pinForm" novalidate>
+              <div class="field" id="f-pcur" hidden><label for="pcur">Current PIN</label><input class="input" id="pcur" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"><div class="err-msg"></div></div>
+              <div class="row">
+                <div class="field" id="f-pnew"><label for="pnew">New 4-digit PIN</label><input class="input" id="pnew" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"><div class="err-msg"></div></div>
+                <div class="field" id="f-pcon"><label for="pcon">Confirm PIN</label><input class="input" id="pcon" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"><div class="err-msg"></div></div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="pinBtn" type="submit">Save PIN</button>
+            </form>
+            <p class="muted" style="font-size:12.5px;margin-top:10px">Forgot your PIN? <a data-advisor target="_blank" rel="noopener">Contact your advisor</a>.</p>
+          </div>
+          <div class="card">
+            <h3>Change password</h3>
+            <form id="passForm" novalidate>
+              <div class="field" id="f-pwc"><label for="pwc">Current password</label><input class="input" id="pwc" type="password" autocomplete="current-password"><div class="err-msg"></div></div>
+              <div class="row">
+                <div class="field" id="f-pwn"><label for="pwn">New password</label><input class="input" id="pwn" type="password" autocomplete="new-password"><div class="err-msg"></div></div>
+                <div class="field" id="f-pwr"><label for="pwr">Confirm</label><input class="input" id="pwr" type="password" autocomplete="new-password"><div class="err-msg"></div></div>
+              </div>
+              <button class="btn btn-primary btn-sm" id="passBtn" type="submit">Update password</button>
+            </form>
+          </div>
+          <button class="btn btn-danger" id="logoutBtn">Sign out</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WITHDRAW -->
+    <section id="page-withdraw" class="page" hidden>
+      <div style="max-width:720px;margin:0 auto">
+        <a href="#/home" class="muted" style="display:inline-block;margin-bottom:12px">← Back to dashboard</a>
+        <div id="wdDone" class="card" hidden style="text-align:center;padding:36px 22px">
+          <div class="okmark"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+          <h3 style="font-size:21px">Withdrawal request submitted</h3>
+          <p class="muted" style="margin:8px auto 18px;max-width:420px">Your request <b id="wdRef"></b> is <b>Pending</b> and awaiting administrator processing. You can cancel it from History while it is pending.</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="btn btn-primary" href="#/history">View history</a><a class="btn btn-ghost" href="#/home">Dashboard</a></div>
+        </div>
+        <div id="wdMain">
+          <div class="steps"><div class="step on"><i>1</i>Bank account</div><div class="step on"><i>2</i>Amount</div><div class="step on"><i>3</i>PIN &amp; confirm</div></div>
+          <div id="wdNotice"></div>
+          <div class="card" style="margin-bottom:16px">
+            <h3>Withdraw to bank</h3>
+            <div class="sumbox"><div><small>Total invested</small><b id="wTotal">$0.00</b></div><div><small>Reserved</small><b id="wRes">$0.00</b></div><div><small>Available</small><b id="wAvail" class="up">$0.00</b></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>Select bank account</b><button class="btn btn-ghost btn-sm" id="addBankBtn">+ Add bank account</button></div>
+            <div id="bankList"></div>
+            <form id="bankForm" hidden novalidate style="margin-top:10px;padding:16px;border-radius:14px;background:var(--inset)">
+              <div class="row">
+                <div class="field" id="f-bn"><label for="bn">Bank name</label><input class="input" id="bn" maxlength="80"><div class="err-msg"></div></div>
+                <div class="field" id="f-ba"><label for="ba">Account name</label><input class="input" id="ba" maxlength="80"><div class="err-msg"></div></div>
+              </div>
+              <div class="row">
+                <div class="field" id="f-bnum"><label for="bnum">Account number</label><input class="input" id="bnum" inputmode="numeric" maxlength="34"><div class="err-msg"></div></div>
+                <div class="field" id="f-bi"><label for="bi">IBAN (optional)</label><input class="input" id="bi" maxlength="34"><div class="err-msg"></div></div>
+              </div>
+              <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" type="submit">Save bank account</button><button class="btn btn-ghost btn-sm" type="button" id="cancelBank">Cancel</button></div>
+            </form>
+          </div>
+          <div class="card">
+            <div class="field" id="f-wamt"><label for="wamt">Withdrawal amount (USD)</label><input class="input" id="wamt" type="number" min="1" step="0.01" inputmode="decimal" placeholder="0.00"><div class="err-msg"></div></div>
+            <button class="btn btn-primary block" id="wdContinue">Continue</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+ </div>
+ <nav class="bottombar" id="bottomNav"></nav>
+</div>
+
+<script type="module">
+/* ====================================================================
+ *  CONFIGURATION  — edit these two things
+ * ==================================================================== */
+// 1) Paste your Firebase web-app config (Project settings → Your apps → Web app)
+const firebaseConfig = {
+  apiKey: "AIzaSyB4ZZ-Lvv50fNu__akJ2wjDM0i_YwTlsQI",
+  authDomain: "lnve-7c664.firebaseapp.com",
+  databaseURL: "https://lnve-7c664-default-rtdb.firebaseio.com",
+  projectId: "lnve-7c664",
+  storageBucket: "lnve-7c664.firebasestorage.app",
+  messagingSenderId: "626939068663",
+  appId: "1:626939068663:web:0133800589425c4b0193f2"
+};
+// 2) The advisor link used by every "Contact advisor" / "Add funds" button
+const ADVISOR_URL = "https://example.com";
+/* ==================================================================== */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getDatabase, ref, onValue, get, set, push, update, remove, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+/* ------------------------------ helpers ------------------------------ */
+const $ = (id) => document.getElementById(id);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = (n) => "$" + Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const compact = (n) => "$" + Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(n || 0);
+const dt = (t) => t ? new Date(t).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "—";
+const pct = (n) => (n > 0 ? "+" : "") + Number(n || 0).toFixed(2).replace(/\.?0+$/, "") + "%";
+const arrow = (up) => `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${up ? '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>' : '<path d="M3 7l6 6 4-4 8 8M15 17h6v-6"/>'}</svg>`;
+function toast(msg, kind = "") { const d = document.createElement("div"); d.className = "toast " + kind; d.textContent = msg; $("toasts").appendChild(d); setTimeout(() => d.remove(), 4200); }
+function setErr(id, msg) { const f = $(id); if (!f) return; f.classList.toggle("err", !!msg); const e = f.querySelector(".err-msg"); if (e) e.textContent = msg || ""; }
+function clearErrs(form) { $$(".field", form).forEach((f) => setErr(f.id, "")); }
+function busy(btn, on, label) { btn.disabled = on; if (on) { btn.dataset.l = btn.innerHTML; btn.innerHTML = '<span class="spinner" style="width:15px;height:15px;border-top-color:#fff"></span>'; } else btn.innerHTML = label || btn.dataset.l || btn.innerHTML; }
+function modal(html) {
+  const o = document.createElement("div"); o.className = "overlay"; o.innerHTML = `<div class="modal">${html}</div>`;
+  o.addEventListener("mousedown", (e) => { if (e.target === o && !o.dataset.lock) o.remove(); });
+  document.body.appendChild(o); return o;
+}
+const friendly = (e) => {
+  const c = e?.code || "";
+  if (c.includes("invalid-credential") || c.includes("wrong-password") || c.includes("user-not-found") || c.includes("invalid-login")) return "Incorrect email or password.";
+  if (c.includes("email-already-in-use")) return "That email is already registered. Try signing in.";
+  if (c.includes("weak-password")) return "Password is too weak. Use at least 8 characters.";
+  if (c.includes("too-many-requests")) return "Too many attempts. Please wait a moment and try again.";
+  if (c.includes("network")) return "Network error. Check your connection.";
+  if (c.includes("user-disabled")) return "This account is suspended. Please contact your advisor.";
+  if (/permission[_ ]denied/i.test(e?.message || "")) return "That action isn't allowed right now. If this account was just changed, sign out and in again.";
+  return e?.message?.replace(/^.*?:\s*/, "") || "Something went wrong. Please try again.";
+};
+
+/* ------------------------------ countries ------------------------------ */
+const COUNTRIES = "AF|Afghanistan;AX|Åland Islands;AL|Albania;DZ|Algeria;AS|American Samoa;AD|Andorra;AO|Angola;AI|Anguilla;AG|Antigua and Barbuda;AR|Argentina;AM|Armenia;AW|Aruba;AU|Australia;AT|Austria;AZ|Azerbaijan;BS|Bahamas;BH|Bahrain;BD|Bangladesh;BB|Barbados;BY|Belarus;BE|Belgium;BZ|Belize;BJ|Benin;BM|Bermuda;BT|Bhutan;BO|Bolivia;BA|Bosnia and Herzegovina;BW|Botswana;BR|Brazil;VG|British Virgin Islands;BN|Brunei;BG|Bulgaria;BF|Burkina Faso;BI|Burundi;KH|Cambodia;CM|Cameroon;CA|Canada;CV|Cape Verde;KY|Cayman Islands;CF|Central African Republic;TD|Chad;CL|Chile;CN|China;CO|Colombia;KM|Comoros;CG|Congo;CD|DR Congo;CK|Cook Islands;CR|Costa Rica;CI|Côte d'Ivoire;HR|Croatia;CU|Cuba;CW|Curaçao;CY|Cyprus;CZ|Czechia;DK|Denmark;DJ|Djibouti;DM|Dominica;DO|Dominican Republic;EC|Ecuador;EG|Egypt;SV|El Salvador;GQ|Equatorial Guinea;ER|Eritrea;EE|Estonia;SZ|Eswatini;ET|Ethiopia;FK|Falkland Islands;FO|Faroe Islands;FJ|Fiji;FI|Finland;FR|France;GF|French Guiana;PF|French Polynesia;GA|Gabon;GM|Gambia;GE|Georgia;DE|Germany;GH|Ghana;GI|Gibraltar;GR|Greece;GL|Greenland;GD|Grenada;GP|Guadeloupe;GU|Guam;GT|Guatemala;GG|Guernsey;GN|Guinea;GW|Guinea-Bissau;GY|Guyana;HT|Haiti;HN|Honduras;HK|Hong Kong;HU|Hungary;IS|Iceland;IN|India;ID|Indonesia;IR|Iran;IQ|Iraq;IE|Ireland;IM|Isle of Man;IL|Israel;IT|Italy;JM|Jamaica;JP|Japan;JE|Jersey;JO|Jordan;KZ|Kazakhstan;KE|Kenya;KI|Kiribati;XK|Kosovo;KW|Kuwait;KG|Kyrgyzstan;LA|Laos;LV|Latvia;LB|Lebanon;LS|Lesotho;LR|Liberia;LY|Libya;LI|Liechtenstein;LT|Lithuania;LU|Luxembourg;MO|Macao;MG|Madagascar;MW|Malawi;MY|Malaysia;MV|Maldives;ML|Mali;MT|Malta;MH|Marshall Islands;MQ|Martinique;MR|Mauritania;MU|Mauritius;YT|Mayotte;MX|Mexico;FM|Micronesia;MD|Moldova;MC|Monaco;MN|Mongolia;ME|Montenegro;MS|Montserrat;MA|Morocco;MZ|Mozambique;MM|Myanmar;NA|Namibia;NR|Nauru;NP|Nepal;NL|Netherlands;NC|New Caledonia;NZ|New Zealand;NI|Nicaragua;NE|Niger;NG|Nigeria;NU|Niue;KP|North Korea;MK|North Macedonia;MP|Northern Mariana Islands;NO|Norway;OM|Oman;PK|Pakistan;PW|Palau;PS|Palestine;PA|Panama;PG|Papua New Guinea;PY|Paraguay;PE|Peru;PH|Philippines;PL|Poland;PT|Portugal;PR|Puerto Rico;QA|Qatar;RE|Réunion;RO|Romania;RU|Russia;RW|Rwanda;BL|Saint Barthélemy;SH|Saint Helena;KN|Saint Kitts and Nevis;LC|Saint Lucia;MF|Saint Martin;PM|Saint Pierre and Miquelon;VC|Saint Vincent and the Grenadines;WS|Samoa;SM|San Marino;ST|São Tomé and Príncipe;SA|Saudi Arabia;SN|Senegal;RS|Serbia;SC|Seychelles;SL|Sierra Leone;SG|Singapore;SX|Sint Maarten;SK|Slovakia;SI|Slovenia;SB|Solomon Islands;SO|Somalia;ZA|South Africa;KR|South Korea;SS|South Sudan;ES|Spain;LK|Sri Lanka;SD|Sudan;SR|Suriname;SE|Sweden;CH|Switzerland;SY|Syria;TW|Taiwan;TJ|Tajikistan;TZ|Tanzania;TH|Thailand;TL|Timor-Leste;TG|Togo;TK|Tokelau;TO|Tonga;TT|Trinidad and Tobago;TN|Tunisia;TR|Türkiye;TM|Turkmenistan;TC|Turks and Caicos Islands;TV|Tuvalu;UG|Uganda;UA|Ukraine;AE|United Arab Emirates;GB|United Kingdom;US|United States;UY|Uruguay;UZ|Uzbekistan;VU|Vanuatu;VA|Vatican City;VE|Venezuela;VN|Vietnam;VI|U.S. Virgin Islands;WF|Wallis and Futuna;EH|Western Sahara;YE|Yemen;ZM|Zambia;ZW|Zimbabwe"
+  .split(";").map((s) => { const [code, name] = s.split("|"); return { code, name }; });
+const flag = (c) => `https://flagcdn.com/w40/${c.toLowerCase()}.png`;
+
+/* ------------------------------ Firebase ------------------------------ */
+const CONFIGURED = !String(firebaseConfig.apiKey).startsWith("YOUR_");
+let app, auth, db;
+if (CONFIGURED) { app = initializeApp(firebaseConfig); auth = getAuth(app); db = getDatabase(app); }
+
+/* ------------------------------ state ------------------------------ */
+const S = { uid: null, profile: null, stats: null, hist: [], tx: {}, wd: {}, notes: {}, gainers: {}, avatar: null, theme: "light", unsub: [], registering: false, range: "1m", txFilter: "All", bankId: null, banks: {}, hasPin: false };
+const DEFAULT_AVATAR = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#e5f7eb"/><circle cx="48" cy="38" r="17" fill="#22b455" opacity=".85"/><path d="M14 96c2-22 16-34 34-34s32 12 34 34z" fill="#22b455" opacity=".85"/></svg>');
+$$("[data-advisor]").forEach((a) => { a.href = ADVISOR_URL; });
+
+/* ====================================================================
+ *  DATA API — no backend. Every write below is validated by database.rules.json
+ *  (balance maths, PIN proof, attempt limits, status rules are all enforced by the database itself).
+ * ==================================================================== */
+const TS = () => serverTimestamp();
+const LOCK_MS = 15 * 60 * 1000, MAX_TRIES = 5;
+let clockOffset = 0; if (CONFIGURED) onValue(ref(db, ".info/serverTimeOffset"), (s) => { clockOffset = s.val() || 0; });
+const serverNow = () => Date.now() + clockOffset;
+const randHex = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map((b) => b.toString(16).padStart(2, "0")).join("");
+const newId = (p) => `${p}-${Date.now().toString(36).toUpperCase()}${randHex(2).toUpperCase()}`;
+async function pinHash(pin, saltHex) { // PBKDF2-SHA256, 150k rounds → 64 hex chars
+  if (!globalThis.crypto?.subtle) throw new Error("PIN features need a secure (HTTPS) connection.");
+  const salt = Uint8Array.from(saltHex.match(/../g).map((h) => parseInt(h, 16)));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: 150000, hash: "SHA-256" }, key, 256);
+  return [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+const lockMsg = (last) => `Too many incorrect attempts. PIN entry is locked for about ${Math.max(1, Math.ceil((last + LOCK_MS - serverNow()) / 60000))} more minute(s). Contact your advisor if you forgot your PIN.`;
+/** Phase 1 of every PIN check: records one attempt (counter + lockout are enforced by the database rules). */
+async function pinAttempt(pin) {
+  const uid = S.uid;
+  const [salt, att, last] = await Promise.all(["salt", "attempts", "lastAt"].map((k) => get(ref(db, `pins/${uid}/${k}`))));
+  if (!salt.exists()) throw new Error("Set up your transaction PIN first.");
+  const a = att.val() || 0, l = last.val() || 0;
+  if (a >= MAX_TRIES && serverNow() < l + LOCK_MS) throw new Error(lockMsg(l));
+  const next = a === 0 ? 1 : a < MAX_TRIES ? a + 1 : 1;
+  const proof = await pinHash(pin, salt.val());
+  await update(ref(db), { [`pins/${uid}/pending`]: { proof, at: TS() }, [`pins/${uid}/attempts`]: next, [`pins/${uid}/lastAt`]: TS() });
+}
+async function pinFailure() {
+  const a = (await get(ref(db, `pins/${S.uid}/attempts`))).val() || 0, l = (await get(ref(db, `pins/${S.uid}/lastAt`))).val() || 0;
+  return a >= MAX_TRIES ? lockMsg(l) : `Incorrect PIN. ${MAX_TRIES - a} attempt(s) remaining.`;
+}
+const PIN_CLEAR = (uid) => ({ [`pins/${uid}/pending`]: null, [`pins/${uid}/attempts`]: null, [`pins/${uid}/lastAt`]: null });
+async function savePin(pin, currentPin) {
+  const uid = S.uid, salt = randHex(16), hash = await pinHash(pin, salt);
+  if (!S.hasPin) return update(ref(db), { [`pins/${uid}/hash`]: hash, [`pins/${uid}/salt`]: salt });
+  await pinAttempt(currentPin);
+  try { await update(ref(db), { [`pins/${uid}/hash`]: hash, [`pins/${uid}/salt`]: salt, ...PIN_CLEAR(uid) }); } catch { throw new Error(await pinFailure()); }
+}
+const notifObj = (title, message, type = "info") => ({ title, message, type, read: false, deleted: false, createdAt: TS() });
+async function createProfile(uid, email, p) {
+  const nid = push(ref(db, `notifications/${uid}`)).key, hid = push(ref(db, `statsHistory/${uid}`)).key, now = TS();
+  await update(ref(db), {
+    [`profiles/${uid}`]: { firstName: p.firstName, lastName: p.lastName, email: email.toLowerCase(), age: p.age, nationality: p.nationality, nationalityCode: p.nationalityCode, phone: p.phone, status: "active", deleted: false, createdAt: now },
+    [`stats/${uid}`]: { totalInvested: 0, percentage: 0, stocks: 0, bonds: 0, crypto: 0, reserved: 0 },
+    [`statsHistory/${uid}/${hid}`]: { t: now, v: 0 },
+    [`notifications/${uid}/${nid}`]: notifObj(`Welcome to InvestorsMoo, ${p.firstName}!`, `Hi ${p.firstName}, we're delighted to have you on board. Your dashboard is ready — explore the crypto market, set up your transaction PIN in Profile, and contact your advisor whenever you'd like help growing your portfolio.`, "welcome"),
+  });
+}
+async function createWithdrawal(bankId, amount, pin) {
+  const uid = S.uid, bank = S.banks[bankId]; amount = Math.round(Number(amount) * 100) / 100;
+  if (!bank) throw new Error("Bank account not found.");
+  if (!(amount >= 1) || amount > avail()) throw new Error("Amount exceeds your available balance.");
+  await pinAttempt(pin);
+  const id = newId("WD"), mA = mask(bank.accountNumber), mI = maskIban(bank.iban), nid = push(ref(db, `notifications/${uid}`)).key;
+  const rec = { id, uid, amount, status: "Pending", createdAt: TS(), updatedAt: TS(), bankName: bank.bankName, accountName: bank.accountName, maskedAccount: mA, bankId };
+  const snap = { bankId, bankName: bank.bankName, accountName: bank.accountName, accountNumber: bank.accountNumber };
+  if (bank.iban) { rec.maskedIban = mI; snap.iban = bank.iban; }
+  try {
+    await update(ref(db), {
+      [`withdrawals/${uid}/${id}`]: rec, [`withdrawalBank/${uid}/${id}`]: snap,
+      [`stats/${uid}/reserved`]: increment(amount), [`stats/${uid}/lastWd`]: id, ...PIN_CLEAR(uid),
+      [`notifications/${uid}/${nid}`]: notifObj("Withdrawal request submitted", `Your withdrawal of ${money(amount)} to ${bank.bankName} (${mA}) was submitted and is awaiting processing. Reference: ${id}.`),
+    });
+  } catch { throw new Error(await pinFailure()); }
+  return { id };
+}
+async function cancelWithdrawal(id) {
+  const uid = S.uid, w = S.wd[id]; if (!w) throw new Error("Withdrawal not found.");
+  const nid = push(ref(db, `notifications/${uid}`)).key;
+  try {
+    await update(ref(db), {
+      [`withdrawals/${uid}/${id}/status`]: "Cancelled", [`withdrawals/${uid}/${id}/cancelledAt`]: TS(), [`withdrawals/${uid}/${id}/updatedAt`]: TS(),
+      [`stats/${uid}/reserved`]: increment(-w.amount), [`stats/${uid}/lastWd`]: id,
+      [`notifications/${uid}/${nid}`]: notifObj("Withdrawal cancelled", `Your withdrawal ${id} of ${money(w.amount)} was cancelled and the amount has been returned to your available balance.`),
+    });
+  } catch { throw new Error("This withdrawal can no longer be cancelled (it may already have been processed)."); }
+}
+
+/* ------------------------------ theme ------------------------------ */
+function applyTheme(t) { S.theme = t === "dark" ? "dark" : "light"; document.documentElement.dataset.theme = S.theme; try { localStorage.setItem("im_theme", S.theme); } catch {} $$("#themeSeg button").forEach((b) => b.classList.toggle("on", b.dataset.t === S.theme)); drawChart(); }
+try { applyTheme(localStorage.getItem("im_theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")); } catch { applyTheme("light"); }
+
+/* ------------------------------ icons / nav ------------------------------ */
+const ICONS = {
+  home: '<path d="M3 11l9-8 9 8M5 10v10h14V10"/>', history: '<path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8M3 3v5h5M12 7v5l3 2"/>',
+  crypto: '<circle cx="12" cy="12" r="9"/><path d="M9.5 8h4a2 2 0 010 4h-4m0 0h4.5a2 2 0 010 4H9.5M9.5 6v12M12 5v2M12 17v2"/>', notifications: '<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',
+  profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>'
+};
+const NAV = [["home", "Home"], ["history", "History"], ["crypto", "Crypto"], ["notifications", "Notifications"], ["profile", "Profile"]];
+const navHtml = NAV.map(([k, l]) => `<a href="#/${k}" data-k="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]}</svg><span>${l}</span>${k === "notifications" ? '<span class="dot-badge nbadge" hidden>0</span>' : ""}</a>`).join("");
+$("sideNav").innerHTML = navHtml; $("bottomNav").innerHTML = navHtml;
+$$(".eye").forEach((b) => { const show = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>'; b.innerHTML = show; b.onclick = () => { const i = b.parentElement.querySelector("input"); i.type = i.type === "password" ? "text" : "password"; b.style.color = i.type === "text" ? "var(--brand)" : ""; }; });
+
+/* ------------------------------ routing ------------------------------ */
+const PAGES = { home: "Dashboard", history: "Transaction History", crypto: "Crypto Market", notifications: "Notifications", profile: "Profile & Settings", withdraw: "Withdraw to Bank" };
+function route() {
+  if (!S.uid) return;
+  let k = (location.hash.replace(/^#\/?/, "") || "home").split("?")[0]; if (!PAGES[k]) k = "home";
+  Object.keys(PAGES).forEach((p) => { const el = $("page-" + p); el.hidden = p !== k; });
+  $$(".nav a,.bottombar a").forEach((a) => a.classList.toggle("on", a.dataset.k === k));
+  $("pageTitle").textContent = PAGES[k]; window.scrollTo({ top: 0 });
+  if (k === "home") requestAnimationFrame(drawChart);
+  if (k === "crypto") startCrypto(); else stopCrypto();
+  if (k === "withdraw") { $("wdDone").hidden = true; $("wdMain").hidden = false; renderWithdraw(); }
+}
+addEventListener("hashchange", route);
+$("bellBtn").onclick = () => { location.hash = "#/notifications"; };
+
+/* ============================== AUTH UI ============================== */
+function showPane(p) { ["Login", "Forgot", "Reg"].forEach((n) => { $("pane" + n).hidden = n !== p; }); }
+$("toReg").onclick = () => showPane("Reg"); $("toForgot").onclick = () => showPane("Forgot"); $$(".toLogin").forEach((b) => (b.onclick = () => showPane("Login")));
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const NAME_RE = /^[\p{L}][\p{L}\p{M}' .-]{0,39}$/u;
+
+/* nationality dropdown */
+let natSel = null;
+(function buildCountry() {
+  const box = $("cdrop");
+  box.innerHTML = `<button type="button" class="cbtn" id="cbtn"><span class="muted">Select your nationality</span></button><div class="cpanel" hidden><input class="input" placeholder="Search country…" id="csearch" autocomplete="off"><div class="clist" id="clist"></div></div>`;
+  const panel = box.querySelector(".cpanel"), list = $("clist");
+  const paint = (q = "") => { list.innerHTML = COUNTRIES.filter((c) => c.name.toLowerCase().includes(q.toLowerCase())).map((c) => `<button type="button" class="copt ${natSel?.code === c.code ? "sel" : ""}" data-c="${c.code}"><img src="${flag(c.code)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">${esc(c.name)}</button>`).join("") || '<div class="empty">No match</div>'; };
+  $("cbtn").onclick = () => { panel.hidden = !panel.hidden; if (!panel.hidden) { paint(); $("csearch").value = ""; $("csearch").focus(); } };
+  $("csearch").oninput = (e) => paint(e.target.value);
+  list.onclick = (e) => { const b = e.target.closest(".copt"); if (!b) return; natSel = COUNTRIES.find((c) => c.code === b.dataset.c); $("cbtn").innerHTML = `<img src="${flag(natSel.code)}" alt="" style="width:22px;height:16px;object-fit:cover;border-radius:3px"> ${esc(natSel.name)}`; panel.hidden = true; setErr("f-rnat", ""); };
+  document.addEventListener("click", (e) => { if (!box.contains(e.target)) panel.hidden = true; });
+})();
+
+$("rpass").addEventListener("input", (e) => {
+  const v = e.target.value; let s = 0; if (v.length >= 8) s++; if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++; if (/\d/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v) || v.length >= 12) s++;
+  $("strBar").style.width = (s * 25) + "%"; $("strBar").style.background = ["var(--red)", "var(--red)", "var(--amber)", "var(--brand)", "var(--brand)"][s];
+});
+
+$("loginForm").onsubmit = async (e) => {
+  e.preventDefault(); if (!CONFIGURED) return; clearErrs(e.target); $("loginErr").textContent = "";
+  const email = $("lemail").value.trim(), pass = $("lpass").value; let bad = false;
+  if (!EMAIL_RE.test(email)) { setErr("f-lemail", "Enter a valid email address."); bad = true; }
+  if (!pass) { setErr("f-lpass", "Enter your password."); bad = true; }
+  if (bad) return;
+  busy($("loginBtn"), true);
+  try {
+    await setPersistence(auth, $("remember").checked ? browserLocalPersistence : browserSessionPersistence);
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (err) { $("loginErr").textContent = friendly(err); busy($("loginBtn"), false, "Sign in"); }
+};
+
+$("forgotForm").onsubmit = async (e) => {
+  e.preventDefault(); if (!CONFIGURED) return; setErr("f-femail", ""); $("forgotMsg").hidden = true;
+  const email = $("femail").value.trim(); if (!EMAIL_RE.test(email)) return setErr("f-femail", "Enter a valid email address.");
+  busy($("forgotBtn"), true);
+  try { await sendPasswordResetEmail(auth, email); } catch (err) { if (String(err.code).includes("too-many")) { busy($("forgotBtn"), false, "Send reset link"); return setErr("f-femail", friendly(err)); } }
+  $("forgotMsg").textContent = "If an account exists for that email, a reset link is on its way. Check your inbox and spam folder."; $("forgotMsg").hidden = false; busy($("forgotBtn"), false, "Send reset link");
+};
+
+$("regForm").onsubmit = async (e) => {
+  e.preventDefault(); if (!CONFIGURED) return; clearErrs(e.target); $("regErr").textContent = "";
+  const v = { firstName: $("rfn").value.trim(), lastName: $("rln").value.trim(), email: $("remail").value.trim().toLowerCase(), pass: $("rpass").value, age: Number($("rage").value), phone: $("rphone").value.trim() };
+  let bad = false; const er = (id, m) => { setErr(id, m); bad = true; };
+  if (!NAME_RE.test(v.firstName)) er("f-rfn", "Enter your first name (letters only)."); if (!NAME_RE.test(v.lastName)) er("f-rln", "Enter your second name (letters only).");
+  if (!EMAIL_RE.test(v.email)) er("f-remail", "Enter a valid email address.");
+  if (v.pass.length < 8) er("f-rpass", "Password must be at least 8 characters."); else if (!/\d/.test(v.pass) || !/[A-Za-z]/.test(v.pass)) er("f-rpass", "Use both letters and numbers.");
+  if (!Number.isInteger(v.age) || v.age < 18 || v.age > 99) er("f-rage", "Age must be between 18 and 99.");
+  const digits = v.phone.replace(/\D/g, ""); if (!/^\+?[0-9][0-9 ()-]{5,19}$/.test(v.phone) || digits.length < 7 || digits.length > 15) er("f-rphone", "Enter a valid phone number.");
+  if (!natSel) er("f-rnat", "Please select your nationality.");
+  if (bad) return;
+  busy($("regBtn"), true); S.registering = true;
+  const payload = { firstName: v.firstName, lastName: v.lastName, age: v.age, phone: v.phone, nationality: natSel.name, nationalityCode: natSel.code };
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    const cred = await createUserWithEmailAndPassword(auth, v.email, v.pass);
+    try { localStorage.setItem("im_pending", JSON.stringify({ email: v.email, ...payload })); } catch {}
+    await createProfile(cred.user.uid, v.email, payload);
+    try { localStorage.removeItem("im_pending"); } catch {}
+    S.registering = false; await boot(cred.user);
+  } catch (err) { S.registering = false; $("regErr").textContent = friendly(err); busy($("regBtn"), false, "Create account"); }
+};
+
+/* ============================== SESSION ============================== */
+if (CONFIGURED) {
+  onAuthStateChanged(auth, async (user) => { if (S.registering) return; if (user) await boot(user); else loggedOut(); });
+} else { $("authView").hidden = false; $("cfgWarn").hidden = false; }
+
+function loggedOut() {
+  S.unsub.forEach((u) => u()); S.unsub = []; S.uid = null; S.profile = null; S.stats = null; S.hist = []; S.tx = {}; S.wd = {}; S.notes = {}; S.avatar = null; S.banks = {}; S.hasPin = false;
+  $("appView").hidden = true; $("authView").hidden = false; stopCrypto();
+  $("loginBtn").disabled = false; $("loginBtn").textContent = "Sign in"; $("regBtn").disabled = false; $("regBtn").textContent = "Create account"; showPane("Login");
+}
+
+async function boot(user) {
+  try {
+    let snap = await get(ref(db, `profiles/${user.uid}`));
+    if (!snap.exists()) { // registration may have been interrupted — retry with locally saved details
+      let p = null; try { p = JSON.parse(localStorage.getItem("im_pending") || "null"); } catch {}
+      if (p && p.email === (user.email || "").toLowerCase()) { const { email, ...rest } = p; await createProfile(user.uid, email, rest); snap = await get(ref(db, `profiles/${user.uid}`)); try { localStorage.removeItem("im_pending"); } catch {} }
+    }
+    const prof = snap.val();
+    if (!prof) { await signOut(auth); $("loginErr").textContent = "No profile found for this account."; return; }
+    if (prof.deleted || prof.status !== "active") { await signOut(auth); $("loginErr").textContent = "This account is not active. Please contact your advisor."; return; }
+    S.uid = user.uid; attach(); $("authView").hidden = true; $("appView").hidden = false; route();
+  } catch (err) { console.error(err); await signOut(auth).catch(() => {}); $("loginErr").textContent = friendly(err); $("loginBtn").disabled = false; $("loginBtn").textContent = "Sign in"; }
+}
+
+function listen(path, cb) { const u = onValue(ref(db, path), cb, (e) => console.warn(path, e.message)); S.unsub.push(u); }
+function attach() {
+  const uid = S.uid;
+  listen(`profiles/${uid}`, (s) => { S.profile = s.val(); if (S.profile && (S.profile.deleted || S.profile.status !== "active")) { toast("Your account has been suspended.", "bad"); signOut(auth); return; } renderProfile(); renderTop(); });
+  listen(`stats/${uid}`, (s) => { S.stats = s.val(); renderHome(); renderWithdraw(); });
+  listen(`statsHistory/${uid}`, (s) => { S.hist = Object.values(s.val() || {}).filter((p) => typeof p.t === "number"); drawChart(); });
+  listen(`transactions/${uid}`, (s) => { S.tx = s.val() || {}; renderHistory(); });
+  listen(`withdrawals/${uid}`, (s) => { S.wd = s.val() || {}; renderHistory(); });
+  listen(`pins/${uid}/salt`, (s) => { S.hasPin = s.exists(); renderProfile(); });
+  listen(`notifications/${uid}`, (s) => { S.notes = s.val() || {}; renderNotes(); });
+  listen("gainers", (s) => { S.gainers = s.val() || {}; renderGainers(); });
+  listen(`avatars/${uid}`, (s) => { S.avatar = s.val(); renderTop(); });
+  listen(`banks/${uid}`, (s) => { S.banks = s.val() || {}; renderBanks(); });
+  listen(`settings/${uid}`, (s) => { const t = s.val()?.theme; if (t) applyTheme(t); });
+}
+
+/* ============================== HOME ============================== */
+const avail = () => Math.max(0, Math.round(((S.stats?.totalInvested || 0) - (S.stats?.reserved || 0)) * 100) / 100);
+function renderTop() {
+  const p = S.profile; if (!p) return;
+  $("topName").textContent = `${p.firstName} ${p.lastName}`; const src = S.avatar || DEFAULT_AVATAR;
+  $("topAv").src = src; $("pAv").src = src;
+}
+function renderHome() {
+  const s = S.stats || {}; const pc = Number(s.percentage || 0);
+  $("hTotal").textContent = money(s.totalInvested);
+  $("hPct").className = "pill " + (pc < 0 ? "down" : "up"); $("hPct").innerHTML = arrow(pc >= 0) + " " + pct(pc);
+  const cards = [["Stocks", s.stocks, "var(--blue)", '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3"/>'], ["Bonds", s.bonds, "var(--amber)", '<path d="M6 3h12v18l-6-4-6 4z"/>'], ["Crypto", s.crypto, "var(--purple)", '<path d="M12 2l9 5v10l-9 5-9-5V7z"/>']];
+  $("statCards").innerHTML = cards.map(([l, v, c, ic]) => `<div class="card stat"><div class="lbl">${l}<span class="ico" style="background:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></span></div><div class="val">${money(v)}</div></div>`).join("");
+  $("bAvail").textContent = money(avail()); $("bRes").textContent = money(s.reserved);
+}
+function renderGainers() {
+  const list = Object.entries(S.gainers).filter(([, g]) => !g.deleted).sort((a, b) => (b[1].change || 0) - (a[1].change || 0));
+  $("gainers").innerHTML = list.length ? list.map(([, g]) => `<div class="gainer"><div class="glogo" style="background:${esc(g.color || "#22b455")}">${esc((g.symbol || g.name || "?").slice(0, 1))}</div><div class="nm"><b>${esc(g.name)}</b><span class="muted" style="font-size:12px">${esc(g.symbol)}</span></div><div class="pr"><b>${money(g.price)}</b><div class="pill ${g.change < 0 ? "down" : "up"}">${arrow(g.change >= 0)} ${pct(g.change)}</div></div></div>`).join("") : '<div class="empty"><b>No gainers yet</b>Top gainers will appear here.</div>';
+}
+$("ranges").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; S.range = b.dataset.r; $$("#ranges button").forEach((x) => x.classList.toggle("on", x === b)); drawChart(); };
+
+/* chart (hand-built SVG) */
+function drawChart() {
+  const box = $("chart"); if (!box || $("page-home").hidden) return;
+  const W = box.clientWidth || 600, H = 250, pl = 58, pr = 10, pt = 10, pb = 26;
+  const now = Date.now(), RM = { "1d": 864e5, "1w": 6048e5, "1m": 2592e6, "6m": 15552e6, "1y": 31536e6 };
+  const all = S.hist.slice().sort((a, b) => a.t - b.t);
+  const from = S.range === "all" ? Math.min(all[0]?.t ?? now - 864e5, now - 36e5) : now - RM[S.range];
+  const before = [...all].reverse().find((p) => p.t < from);
+  let pts = all.filter((p) => p.t >= from); if (before) pts.unshift({ t: from, v: before.v });
+  const cur = S.stats?.totalInvested ?? 0;
+  if (!pts.length) pts = [{ t: from, v: cur }]; else if (pts[0].t > from && !before) pts.unshift({ t: from, v: pts[0].v });
+  pts.push({ t: now, v: pts[pts.length - 1].v });
+  let mn = Math.min(...pts.map((p) => p.v)), mx = Math.max(...pts.map((p) => p.v)); if (mn === mx) { const d = Math.max(1, Math.abs(mx) * 0.1); mn -= d; mx += d; } else { const d = (mx - mn) * 0.12; mn -= d; mx += d; }
+  const x = (t) => pl + ((t - from) / (now - from || 1)) * (W - pl - pr), y = (v) => pt + (1 - (v - mn) / (mx - mn)) * (H - pt - pb);
+  // step-style line: value holds until next change
+  let d = `M${x(pts[0].t)},${y(pts[0].v)}`; for (let i = 1; i < pts.length; i++) d += ` L${x(pts[i].t)},${y(pts[i - 1].v)} L${x(pts[i].t)},${y(pts[i].v)}`;
+  const area = d + ` L${x(now)},${H - pb} L${x(pts[0].t)},${H - pb} Z`;
+  const short = (v) => "$" + Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(v);
+  let grid = "", xl = "";
+  for (let i = 0; i <= 4; i++) { const v = mn + ((mx - mn) * i) / 4, yy = y(v); grid += `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${pl - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${short(v)}</text>`; }
+  for (let i = 0; i <= 4; i++) { const t = from + ((now - from) * i) / 4; const lab = S.range === "1d" ? new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : new Date(t).toLocaleDateString([], { month: "short", day: "numeric" }); xl += `<text x="${x(t)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === 4 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${lab}</text>`; }
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><defs><linearGradient id="gA" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--brand)" stop-opacity=".22"/><stop offset="1" stop-color="var(--brand)" stop-opacity="0"/></linearGradient></defs>${grid}${xl}<path d="${area}" fill="url(#gA)"/><path d="${d}" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linejoin="round"/><line id="cl" y1="${pt}" y2="${H - pb}" stroke="var(--brand)" stroke-opacity=".4" style="display:none"/><circle id="cd" r="5" fill="var(--card)" stroke="var(--brand)" stroke-width="2.5" style="display:none"/></svg><div class="tip" id="tip" hidden></div>`;
+  const svg = box.querySelector("svg"), tip = $("tip"), cd = $("cd"), cl = $("cl");
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect(); const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left; const t = from + ((cx - pl) / (W - pl - pr)) * (now - from);
+    let v = pts[0].v, tt = pts[0].t; for (const p of pts) { if (p.t <= t) { v = p.v; tt = p.t; } } if (cx < pl || cx > W - pr) return leave();
+    cd.setAttribute("cx", cx); cd.setAttribute("cy", y(v)); cl.setAttribute("x1", cx); cl.setAttribute("x2", cx); cd.style.display = cl.style.display = "";
+    tip.hidden = false; tip.style.left = cx + "px"; tip.style.top = y(v) + "px"; tip.innerHTML = `${new Date(Math.min(t, now)).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}<br><b>${money(v)}</b>`;
+  };
+  const leave = () => { tip.hidden = true; cd.style.display = cl.style.display = "none"; };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerleave", leave);
+}
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawChart, 120); });
+
+/* ============================== HISTORY ============================== */
+const STATUS_CLS = { Success: "s-success", Pending: "s-pending", Declined: "s-declined", Reversed: "s-reversed", "On Hold": "s-hold", Cancelled: "s-cancelled" };
+const DEBIT = ["Withdrawal", "Fee"];
+function renderHistory() {
+  const filters = ["All", "Success", "Pending", "On Hold", "Declined", "Reversed", "Cancelled"];
+  $("txFilters").innerHTML = filters.map((f) => `<button class="chip ${S.txFilter === f ? "on" : ""}" data-f="${f}">${f}</button>`).join("");
+  const wds = Object.values(S.wd).map((w) => ({ id: w.id, type: "Withdrawal", amount: w.amount, status: w.status, date: w.createdAt, description: `Withdrawal to ${w.bankName} (${w.maskedAccount})` }));
+  const rows = [...Object.values(S.tx), ...wds].filter((t) => !t.deleted && (S.txFilter === "All" || t.status === S.txFilter)).sort((a, b) => (b.date || 0) - (a.date || 0));
+  $("txList").innerHTML = rows.length ? rows.map((t) => {
+    const neg = DEBIT.includes(t.type);
+    return `<div class="tx"><div class="id">${esc(t.id)}</div><div><b class="ty" style="display:block">${esc(t.type)}</b><span class="muted">${esc(t.description)}</span></div><div class="muted">${dt(t.date)}</div><div class="amt ${neg ? "" : "up"}">${neg ? "−" : "+"}${money(t.amount)}</div><div><span class="badge ${STATUS_CLS[t.status] || "s-cancelled"}">${esc(t.status)}</span></div><div class="act">${t.type === "Withdrawal" && t.status === "Pending" ? `<button class="btn btn-danger btn-sm" data-cancel="${esc(t.id)}">Cancel</button>` : ""}</div></div>`;
+  }).join("") : '<div class="empty"><b>No transactions</b>Your transactions will appear here.</div>';
+}
+$("txFilters").onclick = (e) => { const b = e.target.closest("[data-f]"); if (b) { S.txFilter = b.dataset.f; renderHistory(); } };
+$("txList").onclick = (e) => {
+  const b = e.target.closest("[data-cancel]"); if (!b) return; const id = b.dataset.cancel;
+  const o = modal(`<h3>Cancel withdrawal?</h3><p class="muted" style="margin-bottom:18px">Request <b>${esc(id)}</b> will be cancelled and the reserved amount returned to your available balance.</p><div style="display:flex;gap:8px"><button class="btn btn-ghost block" id="no">Keep it</button><button class="btn btn-danger block" id="yes">Cancel withdrawal</button></div>`);
+  o.querySelector("#no").onclick = () => o.remove();
+  o.querySelector("#yes").onclick = async (ev) => { busy(ev.target, true); try { await cancelWithdrawal(id); toast("Withdrawal cancelled. Amount restored.", "good"); o.remove(); } catch (err) { toast(friendly(err), "bad"); o.remove(); } };
+};
+
+/* ============================== CRYPTO ============================== */
+let cryptoTimer = null, cryptoBusy = false, cryptoPauseUntil = 0; // free keyless API: ~10–30 calls/min per IP, so we back off on HTTP 429
+const CRYPTO_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h";
+function startCrypto() { loadCrypto(); clearInterval(cryptoTimer); cryptoTimer = setInterval(loadCrypto, 60000); }
+function stopCrypto() { clearInterval(cryptoTimer); cryptoTimer = null; }
+async function loadCrypto() {
+  if (cryptoBusy) return; cryptoBusy = true; const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 12000);
+  try {
+    if (Date.now() < cryptoPauseUntil) throw new Error("rate-limit pause");
+    const r = await fetch(CRYPTO_URL, { signal: ctl.signal, headers: { accept: "application/json" } });
+    if (r.status === 429) { cryptoPauseUntil = Date.now() + 120000; throw new Error("HTTP 429"); }
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json(); if (!Array.isArray(data) || !data.length) throw new Error("empty");
+    try { localStorage.setItem("im_crypto", JSON.stringify({ t: Date.now(), data })); } catch {}
+    paintCrypto(data, Date.now(), false);
+  } catch (e) {
+    let c = null; try { c = JSON.parse(localStorage.getItem("im_crypto") || "null"); } catch {}
+    if (c) paintCrypto(c.data, c.t, true); else { $("cryptoList").innerHTML = '<div class="empty"><b>Market data is unavailable</b>We couldn\'t reach the price service. Please try again shortly.</div>'; $("cryptoNotice").innerHTML = ""; $("cryptoMeta").textContent = ""; }
+  } finally { clearTimeout(to); cryptoBusy = false; }
+}
+function paintCrypto(data, t, stale) {
+  $("cryptoNotice").innerHTML = stale ? '<div class="notice"><span>⚠</span><div>Live data is temporarily unavailable. Showing the last saved prices.</div></div>' : "";
+  $("cryptoMeta").textContent = (stale ? "Last saved " : "Updated ") + new Date(t).toLocaleTimeString() + " · auto-refreshes every minute · data by CoinGecko";
+  $("cryptoList").innerHTML = data.slice(0, 20).map((c) => { const ch = c.price_change_percentage_24h ?? 0; const p = c.current_price; const pf = p >= 1 ? money(p) : "$" + Number(p).toPrecision(3);
+    return `<div class="ct"><img src="${esc(c.image)}" alt="" loading="lazy"><div class="coin"><b>${esc(c.name)}</b><span class="muted" style="font-size:12px">${esc(String(c.symbol).toUpperCase())}</span></div><div class="r"><b>${pf}</b></div><div class="r pill ${ch < 0 ? "down" : "up"}" style="justify-content:flex-end">${arrow(ch >= 0)} ${pct(ch)}</div><div class="r">${compact(c.market_cap)}</div><div class="r">${compact(c.total_volume)}</div></div>`; }).join("");
+}
+$("cryptoRefresh").onclick = loadCrypto;
+
+/* ============================== NOTIFICATIONS ============================== */
+const NTI = { welcome: "👋", success: "✅", warning: "⚠️", alert: "🔔", info: "💬" };
+function renderNotes() {
+  const list = Object.entries(S.notes).filter(([, n]) => !n.deleted).sort((a, b) => b[1].createdAt - a[1].createdAt);
+  const unread = list.filter(([, n]) => !n.read).length;
+  $$(".nbadge").forEach((b) => { b.hidden = !unread; b.textContent = unread > 99 ? "99+" : unread; }); $("bellBadge").hidden = !unread; $("bellBadge").textContent = unread > 99 ? "99+" : unread;
+  $("ntList").innerHTML = list.length ? list.map(([id, n]) => `<div class="nt ${n.read ? "" : "unread"}" data-id="${esc(id)}"><div class="ic">${NTI[n.type] || NTI.info}</div><div style="flex:1;min-width:0"><div class="ttl">${esc(n.title)}${n.read ? "" : '<span class="unread-dot"></span>'}</div><div>${esc(n.message)}</div><div class="tm">${dt(n.createdAt)} · tap to mark as ${n.read ? "unread" : "read"}</div></div></div>`).join("") : '<div class="empty"><b>You\'re all caught up</b>No notifications yet.</div>';
+}
+$("ntList").onclick = (e) => { const el = e.target.closest(".nt"); if (!el) return; const n = S.notes[el.dataset.id]; set(ref(db, `notifications/${S.uid}/${el.dataset.id}/read`), !n.read).catch((er) => toast(friendly(er), "bad")); };
+$("markAll").onclick = async () => { const u = {}; Object.entries(S.notes).forEach(([id, n]) => { if (!n.read && !n.deleted) u[`${id}/read`] = true; }); if (Object.keys(u).length) await update(ref(db, `notifications/${S.uid}`), u).catch((er) => toast(friendly(er), "bad")); };
+
+/* ============================== PROFILE ============================== */
+function renderProfile() {
+  const p = S.profile; if (!p) return;
+  if (document.activeElement !== $("pfn")) $("pfn").value = p.firstName; if (document.activeElement !== $("pln")) $("pln").value = p.lastName;
+  $("pEmail").value = p.email; $("pPhone").value = p.phone; $("pAge").value = p.age; $("pNat").value = p.nationality;
+  $("pinState").textContent = S.hasPin ? "Your PIN is set. Enter your current PIN to change it." : "You haven't set a PIN yet. A 4-digit PIN is required to withdraw funds.";
+  $("f-pcur").hidden = !S.hasPin; $("pinBtn").textContent = S.hasPin ? "Change PIN" : "Create PIN";
+}
+$("themeSeg").onclick = async (e) => { const b = e.target.closest("button"); if (!b) return; applyTheme(b.dataset.t); try { await set(ref(db, `settings/${S.uid}/theme`), b.dataset.t); } catch {} };
+$("nameForm").onsubmit = async (e) => {
+  e.preventDefault(); clearErrs(e.target); const f = $("pfn").value.trim(), l = $("pln").value.trim(); let bad = false;
+  if (!NAME_RE.test(f)) { setErr("f-pfn", "Letters only, 1–40 characters."); bad = true; } if (!NAME_RE.test(l)) { setErr("f-pln", "Letters only, 1–40 characters."); bad = true; } if (bad) return;
+  try { await update(ref(db, `profiles/${S.uid}`), { firstName: f, lastName: l }); toast("Name updated.", "good"); } catch (er) { toast(friendly(er), "bad"); }
+};
+$("avBtn").onclick = () => $("avFile").click();
+$("avFile").onchange = async (e) => {
+  const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return toast("Please choose a JPG, PNG or WebP image.", "bad");
+  if (file.size > 5 * 1024 * 1024) return toast("Image must be under 5 MB.", "bad");
+  try {
+    const bmp = await createImageBitmap(file); const N = 256, c = document.createElement("canvas"); c.width = c.height = N; const g = c.getContext("2d"); const s = Math.min(bmp.width, bmp.height);
+    g.drawImage(bmp, (bmp.width - s) / 2, (bmp.height - s) / 2, s, s, 0, 0, N, N);
+    const data = c.toDataURL("image/jpeg", 0.85); if (data.length > 600000) throw new Error("Image too large after processing.");
+    await set(ref(db, `avatars/${S.uid}`), data); toast("Profile photo updated.", "good");
+  } catch (er) { toast(er.message?.includes("decode") ? "That image couldn't be read." : friendly(er), "bad"); }
+};
+$("pinForm").onsubmit = async (e) => {
+  e.preventDefault(); clearErrs(e.target); const has = S.hasPin, cur = $("pcur").value, nw = $("pnew").value, cf = $("pcon").value; let bad = false;
+  if (has && !/^\d{4}$/.test(cur)) { setErr("f-pcur", "Enter your current 4-digit PIN."); bad = true; }
+  if (!/^\d{4}$/.test(nw)) { setErr("f-pnew", "PIN must be exactly 4 digits."); bad = true; } else if (/^(\d)\1{3}$/.test(nw)) { setErr("f-pnew", "Avoid four identical digits."); bad = true; }
+  if (nw !== cf) { setErr("f-pcon", "PINs do not match."); bad = true; } if (bad) return;
+  busy($("pinBtn"), true);
+  try { await savePin(nw, has ? cur : undefined); toast(has ? "PIN changed." : "PIN created.", "good"); e.target.reset(); } catch (er) { setErr(has ? "f-pcur" : "f-pnew", friendly(er)); }
+  busy($("pinBtn"), false, S.hasPin ? "Change PIN" : "Create PIN");
+};
+$("passForm").onsubmit = async (e) => {
+  e.preventDefault(); clearErrs(e.target); const c = $("pwc").value, n = $("pwn").value, r = $("pwr").value; let bad = false;
+  if (!c) { setErr("f-pwc", "Enter your current password."); bad = true; } if (n.length < 8 || !/\d/.test(n) || !/[A-Za-z]/.test(n)) { setErr("f-pwn", "At least 8 characters with letters and numbers."); bad = true; } if (n !== r) { setErr("f-pwr", "Passwords do not match."); bad = true; } if (bad) return;
+  busy($("passBtn"), true);
+  try { const u = auth.currentUser; await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, c)); await updatePassword(u, n); toast("Password updated.", "good"); e.target.reset(); }
+  catch (er) { if (/credential|password/.test(er.code || "") && !/weak/.test(er.code)) setErr("f-pwc", "Current password is incorrect."); else setErr("f-pwn", friendly(er)); }
+  busy($("passBtn"), false, "Update password");
+};
+$("logoutBtn").onclick = () => signOut(auth);
+
+/* ============================== WITHDRAW ============================== */
+const BANK_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18"/></svg>';
+const mask = (n) => "•••• " + String(n).replace(/\s/g, "").slice(-4);
+const maskIban = (s) => { const d = String(s || "").replace(/\s+/g, ""); return d ? d.slice(0, 4) + " •••• " + d.slice(-4) : ""; };
+function renderBanks() {
+  const ids = Object.keys(S.banks).sort((a, b) => (S.banks[a].createdAt || 0) - (S.banks[b].createdAt || 0));
+  if (!ids.includes(S.bankId)) S.bankId = ids[0] || null;
+  $("bankList").innerHTML = ids.length ? ids.map((id) => { const b = S.banks[id]; return `<div class="bank ${id === S.bankId ? "sel" : ""}" data-b="${esc(id)}" role="button" tabindex="0"><div class="bi">${BANK_ICON}</div><div><b>${esc(b.bankName)}</b><div class="muted" style="font-size:12.5px">${esc(b.accountName)} · ${mask(b.accountNumber)}</div></div><button class="rm" data-rm="${esc(id)}" aria-label="Remove bank account" title="Remove">✕</button></div>`; }).join("") : '<div class="empty" style="padding:18px"><b>No bank account saved</b>Add a bank account to continue.</div>';
+  if (!ids.length) $("bankForm").hidden = false;
+}
+function renderWithdraw() {
+  const s = S.stats || {}, a = avail();
+  $("wTotal").textContent = money(s.totalInvested); $("wRes").textContent = money(s.reserved); $("wAvail").textContent = money(a);
+  $("wdNotice").innerHTML = a <= 0 ? `<div class="notice bad"><span>⚠</span><div><b>Add funds to withdraw</b><div class="muted">${(s.totalInvested || 0) <= 0 ? "Your Total Invested Value is $0.00." : "Your available balance is fully reserved by pending withdrawals."} You need available funds before requesting a withdrawal.</div><a class="btn btn-primary btn-sm" data-advisor href="${esc(ADVISOR_URL)}" target="_blank" rel="noopener">Add Funds</a></div></div>` : "";
+  $("wamt").max = a; $("wdContinue").disabled = a <= 0; renderBanks();
+}
+$("addBankBtn").onclick = () => { $("bankForm").hidden = false; $("bn").focus(); };
+$("cancelBank").onclick = () => { if (Object.keys(S.banks).length) $("bankForm").hidden = true; $("bankForm").reset(); clearErrs($("bankForm")); };
+$("bankForm").onsubmit = async (e) => {
+  e.preventDefault(); clearErrs(e.target); const bn = $("bn").value.trim(), ba = $("ba").value.trim(), num = $("bnum").value.replace(/\s/g, ""), iban = $("bi").value.replace(/\s/g, "").toUpperCase(); let bad = false;
+  if (bn.length < 2) { setErr("f-bn", "Enter the bank name."); bad = true; } if (ba.length < 2) { setErr("f-ba", "Enter the account holder name."); bad = true; }
+  if (!/^[A-Za-z0-9-]{4,34}$/.test(num)) { setErr("f-bnum", "Enter a valid account number (4–34 characters)."); bad = true; }
+  if (iban && !/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(iban)) { setErr("f-bi", "Enter a valid IBAN or leave blank."); bad = true; } if (bad) return;
+  const rec = { bankName: bn, accountName: ba, accountNumber: num, createdAt: Date.now() }; if (iban) rec.iban = iban;
+  try { const k = push(ref(db, `banks/${S.uid}`)).key; await set(ref(db, `banks/${S.uid}/${k}`), rec); S.bankId = k; e.target.reset(); e.target.hidden = true; toast("Bank account saved.", "good"); } catch (er) { toast(friendly(er), "bad"); }
+};
+$("bankList").onclick = (e) => {
+  const rm = e.target.closest("[data-rm]");
+  if (rm) { e.stopPropagation(); const id = rm.dataset.rm; const o = modal(`<h3>Remove bank account?</h3><p class="muted" style="margin-bottom:16px">Existing withdrawal requests are not affected.</p><div style="display:flex;gap:8px"><button class="btn btn-ghost block" id="n">Keep</button><button class="btn btn-danger block" id="y">Remove</button></div>`); o.querySelector("#n").onclick = () => o.remove(); o.querySelector("#y").onclick = async () => { await remove(ref(db, `banks/${S.uid}/${id}`)).catch((er) => toast(friendly(er), "bad")); o.remove(); }; return; }
+  const b = e.target.closest("[data-b]"); if (b) { S.bankId = b.dataset.b; renderBanks(); }
+};
+$("wdContinue").onclick = () => {
+  setErr("f-wamt", ""); const a = avail(), amt = Math.round(Number($("wamt").value) * 100) / 100;
+  if (!S.bankId || !S.banks[S.bankId]) return toast("Select or add a bank account first.", "bad");
+  if (!Number.isFinite(amt) || amt < 1) return setErr("f-wamt", "Enter an amount of at least $1.00.");
+  if (a <= 0 || amt > a) return setErr("f-wamt", `Amount exceeds your available balance of ${money(a)}.`);
+  if (!S.hasPin) { const o = modal(`<h3>Set up your PIN first</h3><p class="muted" style="margin:6px 0 16px">A 4-digit transaction PIN is required to withdraw funds.</p><a class="btn btn-primary block" href="#/profile" id="gp">Create PIN</a>`); o.querySelector("#gp").onclick = () => o.remove(); return; }
+  openPin(amt);
+};
+function openPin(amt) {
+  const bank = S.banks[S.bankId], bankId = S.bankId;
+  const o = modal(`<h3>Confirm with your PIN</h3><p class="muted">Withdraw <b>${money(amt)}</b> to ${esc(bank.bankName)} (${mask(bank.accountNumber)})</p><div class="pinrow" id="pr">${[0, 1, 2, 3].map(() => '<input type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit">').join("")}</div><div class="err-msg" id="pe" style="text-align:center;min-height:18px"></div><button class="btn btn-primary block" id="pgo" style="margin-top:10px" disabled>Submit withdrawal</button><button class="btn btn-ghost block" id="pcn" style="margin-top:8px">Cancel</button><p class="muted" style="font-size:12.5px;text-align:center;margin-top:12px">Forgot your PIN? <a data-advisor href="${esc(ADVISOR_URL)}" target="_blank" rel="noopener">Contact your advisor</a></p>`);
+  o.dataset.lock = "1"; const ins = $$("input", o), go = o.querySelector("#pgo"), pe = o.querySelector("#pe"), row = o.querySelector("#pr");
+  const val = () => ins.map((i) => i.value).join("");
+  ins.forEach((i, k) => {
+    i.addEventListener("input", () => { i.value = i.value.replace(/\D/g, "").slice(-1); if (i.value && ins[k + 1]) ins[k + 1].focus(); go.disabled = val().length !== 4; if (val().length === 4) go.focus(); });
+    i.addEventListener("keydown", (e) => { if (e.key === "Backspace" && !i.value && ins[k - 1]) ins[k - 1].focus(); if (e.key === "Enter" && val().length === 4) go.click(); });
+    i.addEventListener("paste", (e) => { const t = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 4); if (t) { e.preventDefault(); ins.forEach((x, j) => (x.value = t[j] || "")); go.disabled = t.length !== 4; } });
+  });
+  ins[0].focus(); o.querySelector("#pcn").onclick = () => o.remove();
+  go.onclick = async () => {
+    const pin = val(); if (!/^\d{4}$/.test(pin)) return; pe.textContent = ""; busy(go, true);
+    try {
+      const r = await createWithdrawal(bankId, amt, pin);
+      o.remove(); $("wdRef").textContent = r.id; $("wdMain").hidden = true; $("wdDone").hidden = false; $("wamt").value = ""; window.scrollTo({ top: 0 });
+    } catch (er) {
+      busy(go, false, "Submit withdrawal"); pe.textContent = friendly(er); ins.forEach((i) => (i.value = "")); go.disabled = true; row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); ins[0].focus();
+      if (/available balance|bank account not found/i.test(er.message)) { o.remove(); toast(er.message, "bad"); }
+    }
+  };
+}
+</script>
+</body>
+</html>
